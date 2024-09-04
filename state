@@ -1,0 +1,53 @@
+To create a State Transition Diagram for the tracking system represented in the code, we need to define the possible states of the system and the transitions between these states based on events or conditions.
+
+### States
+1. **Idle**: The system is initialized and waiting for measurements.
+2. **Processing Measurement**: The system is processing an incoming measurement.
+3. **Check Doppler Correlation**: The system checks if the Doppler of the current measurement correlates with existing tracks.
+4. **Check Range Gate**: The system checks if the Cartesian distance between the current measurement and the last measurement of a track is within a specified range.
+5. **Assign to Track**: The system assigns the measurement to an existing track.
+6. **Create New Track**: The system creates a new track if the measurement does not fit any existing tracks.
+7. **Update Track State**: The system updates the state of the track, deciding if it becomes firm or remains tentative.
+8. **End**: The system ends the processing of the current measurement.
+
+### Events / Transitions
+- **Measurement Received**: Transition from `Idle` to `Processing Measurement`.
+- **Doppler Correlates**: Transition from `Check Doppler Correlation` to `Check Range Gate`.
+- **Range Satisfied**: Transition from `Check Range Gate` to `Assign to Track`.
+- **Conditions Not Met**: Transition from `Check Doppler Correlation` or `Check Range Gate` to `Create New Track`.
+- **Track Assigned**: Transition from `Assign to Track` to `Update Track State`.
+- **Track Created**: Transition from `Create New Track` to `Update Track State`.
+- **Measurement Processed**: Transition from `Update Track State` back to `Idle`.
+
+### PlantUML Diagram
+
+Here is the PlantUML code for the State Transition Diagram:
+
+```plantuml
+@startuml
+[*] --> Idle : System Initialized
+Idle --> Processing Measurement : Measurement Received
+
+Processing Measurement --> Check Doppler Correlation : Process Measurement
+
+Check Doppler Correlation --> Check Range Gate : Doppler Correlates
+Check Doppler Correlation --> Create New Track : No Doppler Correlation
+
+Check Range Gate --> Assign to Track : Range Satisfied
+Check Range Gate --> Create New Track : Range Not Satisfied
+
+Assign to Track --> Update Track State : Measurement Assigned
+Create New Track --> Update Track State : Track Created
+
+Update Track State --> Idle : Measurement Processed
+@enduml
+```
+
+### Diagram Description
+- **Idle** is the starting state, where the system waits for new measurements.
+- When a **Measurement Received** event occurs, the system moves to **Processing Measurement**.
+- The system then checks **Doppler Correlation**. If correlated, it moves to **Check Range Gate**; otherwise, it attempts to **Create New Track**.
+- If **Range Satisfied**, the system **Assigns to Track**; otherwise, it creates a new track.
+- Finally, the system **Updates Track State** and returns to the **Idle** state, ready to process the next measurement.
+
+This State Transition Diagram captures the flow and decision-making processes within the tracking system as it handles incoming measurements.
